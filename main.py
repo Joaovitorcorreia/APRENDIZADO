@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends
 from models import User
-from schemas import UserCreate, UserResponse
+from schemas import UserCreate, UserResponse, UserMessageCreate
 from sqlalchemy.orm import Session
 from database import SessionLocal, engine, Base
 
@@ -17,7 +17,7 @@ def get_db():
         db.close()
 
 # Cria um novo usuário
-@app.post("/novo-usuário/", response_model=UserCreate)
+@app.post("/novo-usuário/", response_model=UserMessageCreate)
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
     novo_usuario = User(name=user.name, email=user.email)
     db.add(novo_usuario)
@@ -26,7 +26,7 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
     return {"name": novo_usuario.name, "email": novo_usuario.email, "message": "Usuário criado com sucesso!"}
 
 # Procura um usuário existente pelo email
-@app.get("/usuários-existentes/", response_model=UserResponse)
+@app.get("/usuários-existentes/", response_model=UserMessageCreate)
 def get_user(email: str, db: Session = Depends(get_db)):
     usuario_existente = db.query(User).filter(User.email == email).first()
     if not usuario_existente:
